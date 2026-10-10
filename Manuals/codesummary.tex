@@ -1,0 +1,438 @@
+\documentclass[12pt]{amsproc}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage[margin=1.02in]{geometry}
+
+\hypersetup{colorlinks=true,linkcolor=blue!55!black,citecolor=blue!55!black,urlcolor=blue!55!black}
+\urlstyle{same}
+\allowdisplaybreaks
+\emergencystretch=2em
+
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{remark}[proposition]{Remark}
+\newtheorem{definition}[proposition]{Definition}
+
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\wt}{\operatorname{wt}}
+\newcommand{\dep}{\operatorname{dep}}
+\newcommand{\code}[1]{\nolinkurl{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\lstdefinelanguage{GP}{
+  morekeywords={default,print,return,my,for,if,error,vector,matrix,apply,select,concat,Map,mapget,mapput,mapisdefined,Set,Vec,Mat,qflll,read,write,localprec,precision,content,simplify,substvec},
+  sensitive=true,
+  morecomment=[l]{\\\\},
+  morestring=[b]"
+}
+\lstset{basicstyle=\ttfamily\small,columns=fullflexible,keepspaces=true,showstringspaces=false,breaklines=true,frame=single,framerule=0.25pt,rulecolor=\color{black!35},keywordstyle=\bfseries,commentstyle=\itshape\color{black!60},xleftmargin=0.5em,xrightmargin=0.5em,aboveskip=0.8em,belowskip=0.8em}
+
+\title{List of commands for \texttt{ToricMZV} code}
+\author[]{Abhiram Kidambi, for the Toric MZV collaboration (Annika Burmester, Steven Charlton, Felix Lotter, Rosa Prei\ss)}
+\date{Last updated: \today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+Here is a summary of all the functiosn that are used in the code. Note that some of the commands, especially the conversion to the depth minimal basis are deprecated. 
+
+\section{PARI/GP command reference}
+The function call \code{slotlabel} and, in the Sage notebook, \code{slotbasis} are actual function names in the source.  No idea why this is used for degree $d$ monomials.
+I got Gemini to order by section in code now. 
+\vspace{0.5cm}
+\begingroup\scriptsize\sloppy
+\setlength\LTpre{0pt}\setlength\LTpost{0pt}
+\begin{longtable}{@{}L{0.245\textwidth}L{0.440\textwidth}L{0.245\textwidth}@{}}
+\toprule
+Command & Description & Example \\
+\midrule
+\endfirsthead
+\toprule
+Command & Description & Example \\
+\midrule
+\endhead
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{2. Basic helpers}}\\[2pt]
+\code{checknat(n, name)} & Require a nonnegative integer. & \code{checknat(5,"k")} \\
+\addlinespace[2pt]
+\code{varvec(var, n0, n1)} & Construct quoted symbolic variables from a prefix and an index range. & \code{varvec('X,1,3)} \\
+\addlinespace[2pt]
+\code{monomial(vec, exps)} & Evaluate one monomial given its exponent vector. & \code{monomial([x,y],[2,1])} \\
+\addlinespace[2pt]
+\code{monomialvec(vec, exps)} & Evaluate a vector of monomials in a common set of variables. & \code{monomialvec([x,y],[[2,0],[1,1]])} \\
+\addlinespace[2pt]
+\code{monomiallabel(labels, exps)} & Format a monomial from textual factor labels and integer exponents. & \code{monomiallabel(["A","B"],[2,1])} \\
+\addlinespace[2pt]
+\code{relrank(rels)} & Compute the exact rational rank of integer coefficient columns. & \code{relrank([[1,-1]~,[0,1]~])} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{3. Compositions and monomials}}\\[2pt]
+\code{partition(n, a, b)} & List multiplicity choices satisfying a*x+b*y=n. & \code{partition(10,2,3)} \\
+\addlinespace[2pt]
+\code{perms(x, y, a, b)} & List distinct words with x copies of a and y copies of b. & \code{perms(2,1,2,3)} \\
+\addlinespace[2pt]
+\code{parts(n, a = 2, b = 3)} & List all ordered words of weight n over two distinct positive letters. & \code{parts(14,2,3)} \\
+\addlinespace[2pt]
+\code{compositions(n)} & Enumerate compositions by increasing binary cut mask. & \code{compositions(5)} \\
+\addlinespace[2pt]
+\code{admissible(k)} & List all convergent MZV indices of weight k in binary-cut order. & \code{admissible(5)} \\
+\addlinespace[2pt]
+\code{getexponents(n, deg)} & Enumerate nonnegative exponent vectors of length n and sum deg. & \code{getexponents(3,2)} \\
+\addlinespace[2pt]
+\code{nonlin(vec, deg)} & Enumerate the homogeneous monomials of the requested total degree in the supplied entries. Equal values are not identified. & \code{nonlin(varvec('X,1,3),2)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{4. Lyndon words}}\\[2pt]
+\code{veccmp(u, v)} & Compare integer words lexicographically, including unequal lengths. & \code{veccmp([2,3],[3,2])} \\
+\addlinespace[2pt]
+\code{islyndon(w, flag = 0)} & Test strict or non-strict minimality among cyclic rotations. & \code{islyndon([2,3])} \\
+\addlinespace[2pt]
+\code{lyndonwords(k, flag = 0)} & Enumerate weight-k Lyndon words over the ordered alphabet 2<3. & \code{lyndonwords(12)} \\
+\addlinespace[2pt]
+\code{lyndonarray(k)} & Group strict Lyndon words by weights 1 through k. & \code{lyndonarray(12)} \\
+\addlinespace[2pt]
+\code{lwto(k)} & Flatten the strict Lyndon words of weights at most k. & \code{lwto(12)} \\
+\addlinespace[2pt]
+\code{lwbasis(k, flag = 0)} & Name the selected weight-k Lyndon coordinates without asserting independence. & \code{lwbasis(12)} \\
+\addlinespace[2pt]
+\code{totlyn(k)} & Count strict Lyndon words of weights at most k. & \code{totlyn(14)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{5. The fixed-weight monomial model}}\\[2pt]
+\code{weightwalk(weights, pos, remaining)} & Recursively distribute remaining weight among the remaining generators. & \code{weightwalk([2,3,5],1,10)} \\
+\addlinespace[2pt]
+\code{weightexponents(weights, k)} & Enumerate monomials of weighted degree k with positive integer weights. & \code{weightexponents([2,3,5],10)} \\
+\addlinespace[2pt]
+\code{weightpartition(weights, exps)} & Expand a weighted exponent vector into its sorted factor-weight partition. & \code{weightpartition([2,3,5],[1,1,1])} \\
+\addlinespace[2pt]
+\code{lyndondata(k)} & Build a duplicate-free fixed-weight coordinate model and its index dictionary. & \code{model=lyndondata(14)} \\
+\addlinespace[2pt]
+\code{getlyndonarray(k)} & Return the fixed-weight monomials grouped by factor-weight partition. & \code{getlyndonarray(14)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{6. Exact formal relations}}\\[2pt]
+\code{exponentimage(exps, powers)} & Add coordinate exponent vectors with the specified multiplicities. & \code{exponentimage([[1,0],[0,1]],[2,1])} \\
+\addlinespace[2pt]
+\code{productdata(exps, deg)} & Enumerate the homogeneous monomials of total degree deg in the fixed-weight coordinates, group them by exponent image, and record one binomial basis relation for every nonrepresentative monomial. & \code{productdata(exps,2)} \\
+\addlinespace[2pt]
+\code{formalrels(k, deg)} & Build the fixed-weight coordinate model and return the sparse binomial basis of the homogeneous kernel in polynomial degree deg. & \code{rels=formalrels(14,2)} \\
+\addlinespace[2pt]
+\code{formalpolys(data)} & Convert the sparse formal basis into polynomials in X1 through XN. & \code{formalpolys(formalrels(12,2))} \\
+\addlinespace[2pt]
+\code{formalvectors(data)} & Return dense coefficient columns for the formal relations with respect to the ordered homogeneous monomial basis of total degree deg. & \code{formalvectors(formalrels(12,2))} \\
+\addlinespace[2pt]
+\code{verifyformal(data)} & Verify the stored exponent collisions and the sparse basis cardinality. & \code{verifyformal(formalrels(14,2))} \\
+\addlinespace[2pt]
+\code{formalsummary(data)} & Print the exact coordinate, image, and homogeneous-kernel counts. & \code{formalsummary(data)} \\
+\addlinespace[2pt]
+\code{printformal(data, limit = 10)} & Print a bounded number of exact formal binomial relations. & \code{printformal(formalrels(14,2),5)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{7. From Xi coordinates to Lyndon basis of MZVs}}\\[2pt]
+\code{mzvlabel(w)} & Format one MZV index word in mzv[...] notation. & \code{mzvlabel([2,3])} \\
+\addlinespace[2pt]
+\code{mzvmonlabel(words, exps)} & Format an exponent vector as a product of Lyndon-word MZVs. & \code{mzvmonlabel([[2],[3]],[2,1])} \\
+\addlinespace[2pt]
+\code{coordlabels(data)} & Return the Lyndon-MZV product represented by every Xi coordinate. & \code{coordlabels(formalrels(12,2))} \\
+\addlinespace[2pt]
+\code{slotlabel(labels, powers)} & Format one homogeneous monomial after replacing each Xi by its displayed Lyndon-MZV product. & \code{slotlabel(["A","B"],[2,1])} \\
+\addlinespace[2pt]
+\code{formaltranslations(data)} & Return the Xi relation, both substituted sides, and their common expanded MZV monomial. & \code{formaltranslations(data)} \\
+\addlinespace[2pt]
+\code{printxmap(k)} & Print Xi, its formal Lyndon monomial, and its Lyndon-MZV product. & \code{printxmap(12)} \\
+\addlinespace[2pt]
+\code{printformalmzv(data, limit = 10)} & Print exact formal relations together with their explicit Lyndon-MZV substitutions. & \code{printformalmzv(data,4)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{8. Numerical MZV evaluation}}\\[2pt]
+\code{checkindices(pts)} & Check convergence and integral positivity of every MZV index word. & \code{checkindices([[2],[2,3]])} \\
+\addlinespace[2pt]
+\code{tozetavec(pts, prec = 100)} & Recompute the specified convergent MZVs at a local decimal precision. & \code{tozetavec([[2],[3]],100)} \\
+\addlinespace[2pt]
+\code{tozeta(k, flag = 0, prec = 100)} & Evaluate the selected weight-k Lyndon words at the requested precision. & \code{tozeta(12,0,100)} \\
+\addlinespace[2pt]
+\code{monomialvalues(pts, exps, prec = 100)} & Recompute the MZV generators and evaluate their monomials in the same precision scope. & \code{monomialvalues([[2],[3]],[[2,0],[1,1]],100)} \\
+\addlinespace[2pt]
+\code{xvalues(k, prec = 100)} & Evaluate every Xi coordinate as its product of Lyndon MZVs at fresh precision. & \code{xvalues(14,120)} \\
+\addlinespace[2pt]
+\code{wtgrmzv(k, prec = 100)} & Evaluate every admissible MZV index of weight k. & \code{wtgrmzv(5,100)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{9. Numerical checks of candidate relations}}\\[2pt]
+\code{primitive(c)} & Normalize a nonzero integer relation column to coprime coefficients and positive first entry. & \code{primitive([2,-4,2]~)} \\
+\addlinespace[2pt]
+\code{checkvalues(x, prec)} & Require real or rational inputs with adequate stored floating-point precision. & \code{checkvalues(tozetavec([[2],[3]],100),80)} \\
+\addlinespace[2pt]
+\code{relcheck(c, x, digits)} & Report the actual residual, normalized residual, capped digits, and tolerance test. & \code{relcheck([1,-1]~,[1.0,1.0],20)} \\
+\addlinespace[2pt]
+\code{allrelations(x, prec = 100, height = 10^6, guard = 30)} & Run one qflll reduction on a numerical vector, normalize candidate coefficient columns, impose the height bound, and retain candidates passing the residual test. This is a single-precision candidate generator. & \code{allrelations(tozetavec([[2,3],[3,2],[5]],120),100)} \\
+\addlinespace[2pt]
+\code{findrel(x, prec = 100, height = 10^6, guard = 30)} & Return the first bounded single-precision candidate, or an empty column. & \code{findrel(tozetavec([[2,3],[3,2],[5]],120),100)} \\
+\addlinespace[2pt]
+\code{relationsearch(builder, prec = 100, extra = 60, height = 10^6, guard = 30)} & Evaluate the supplied builder at two fresh precisions, generate candidates from the lower-precision data, and verify them against the higher-precision values. & \code{relationsearch(p -> tozetavec([[2,3],[3,2],[5]],p),100)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{10. Conversion to Hoffman basis}}\\[2pt]
+\code{hoffmanbasis(k)} & Return the weight-k Hoffman family over 2 and 3 in GP order. & \code{hoffmanbasis(14)} \\
+\addlinespace[2pt]
+\code{hoffmanlabels(k)} & Return mzv[...] labels for the ordered weight-k Hoffman family. & \code{hoffmanlabels(14)} \\
+\addlinespace[2pt]
+\code{hoffmanvalues(k, prec = 100)} & Recompute the ordered weight-k Hoffman family at fresh precision. & \code{hoffmanvalues(14,120)} \\
+\addlinespace[2pt]
+\code{collectterms(terms)} & Collect equal MZV words and put them in deterministic lexicographic order. & \code{collectterms([[[2,3],1],[[2,3],2]])} \\
+\addlinespace[2pt]
+\code{prefixterms(a, terms)} & Prefix every MZV word in an exact linear combination by a. & \code{prefixterms(2,[[[3],1]])} \\
+\addlinespace[2pt]
+\code{stuffletwo(u, v)} & Expand the harmonic product of two GP-convention MZV words exactly. & \code{stuffletwo([2],[3])} \\
+\addlinespace[2pt]
+\code{stuffleappend(comb, w)} & Multiply an exact MZV linear combination by one MZV word using stuffle. & \code{stuffleappend([[[2],1]],[3])} \\
+\addlinespace[2pt]
+\code{stuffleproduct(factors)} & Expand a product of MZV words as an exact linear combination of single MZVs. & \code{stuffleproduct([[2],[3],[2]])} \\
+\addlinespace[2pt]
+\code{xfactors(k, i)} & Return the Lyndon MZV factors whose product defines Xi at weight k. & \code{xfactors(14,20)} \\
+\addlinespace[2pt]
+\code{xstuffle(k, i)} & Expand Xi exactly as a linear combination of single weight-k MZVs. & \code{xstuffle(14,20)} \\
+\addlinespace[2pt]
+\code{mzvsumlabel(terms)} & Format an exact integer linear combination of single MZVs. & \code{mzvsumlabel(stuffletwo([2],[3]))} \\
+\addlinespace[2pt]
+\code{xstufflevalue(k, i, prec = 100)} & Evaluate the exact stuffle expansion of Xi at fresh precision. & \code{xstufflevalue(14,20,120)} \\
+\addlinespace[2pt]
+\code{printxstuffle(k, i)} & Print the exact stuffle expansion of Xi into single weight-k MZVs. & \code{printxstuffle(14,20)} \\
+\addlinespace[2pt]
+\code{formatlinear(coeffs, labels)} & Format a rational linear combination against textual basis labels. & \code{formatlinear([1/2,-3],["H1","H2"])} \\
+\addlinespace[2pt]
+\code{hoffmanexact(k, words, coeffs)} & Validate an exact rational matrix for the ordered Hoffman words and package the linear forms Xi=sum\_j Aij Hj. It rejects non-Hoffman word lists. & \code{hoffmanexact(5,words,A)} \\
+\addlinespace[2pt]
+\code{loadhoffman(filename)} & Read a Sage-generated [weight,words,matrix] record and pass it through hoffmanexact. Consequently the current loader accepts only the standard Hoffman ordering. & \code{hoff=loadhoffman("hoffman14.gp")} \\
+\addlinespace[2pt]
+\code{loadhoffmank(k)} & Load the standard Sage export hoffman<k>.gp from the current directory. & \code{hoff=loadhoffmank(14)} \\
+\addlinespace[2pt]
+\code{verifyhoffman(data, prec = 140, digits = 90)} & Numerically cross-check an imported exact Hoffman matrix against fresh PARI evaluations. & \code{verifyhoffman(hoff,140,90)} \\
+\addlinespace[2pt]
+\code{printhoffmanbasis(k)} & Print the Hj variables and their single weight-k MZV meanings. & \code{printhoffmanbasis(14)} \\
+\addlinespace[2pt]
+\code{printhoffmanconversion(data, limit = 10)} & Print Xi directly as exact rational combinations of single Hoffman MZVs. & \code{printhoffmanconversion(hoff,5)} \\
+\addlinespace[2pt]
+\code{relationpoly(c, k, deg)} & Interpret a coefficient vector relative to the ordered homogeneous monomial basis of total degree deg and return the corresponding polynomial in X1,...,XN. & \code{v=formalvectors(data); relationpoly(v[1],12,2)} \\
+\addlinespace[2pt]
+\code{primitivepoly(p)} & Divide a rational polynomial by the absolute value of its rational content, giving a primitive integral polynomial. The routine does not impose an additional sign convention. & \code{primitivepoly(2/3*'T^2-4/9*'T)} \\
+\addlinespace[2pt]
+\code{relationhoffman(c, k, deg, conversion)} & Substitute the imported Hoffman linear forms into one coefficient vector on the ordered homogeneous monomial basis of total degree deg and return its primitive integral polynomial. & \code{v=formalvectors(data); relationhoffman(v[1],12,2,loadhoffmank(12))} \\
+\addlinespace[2pt]
+\code{rewritehoffman(pols, conversion)} & Substitute an exact weight-k Hoffman matrix into any polynomial list in X1 through XN. & \code{rewritehoffman(pols,hoff)} \\
+\addlinespace[2pt]
+\code{formalhoffman(formal, conversion)} & Rewrite every stored formal binomial in Hoffman variables. Each homogeneous monomial of total degree deg that occurs in the sparse relation list is expanded at most once. & \code{formalhoffman(formalrels(14,2),hoff)} \\
+\addlinespace[2pt]
+\code{allhoffman(k, deg, conversion)} & Compute formalrels(k,deg) and rewrite the resulting exact binomials in the supplied Hoffman coordinates. & \code{allhoffman(14,2,hoff)} \\
+\addlinespace[2pt]
+\code{printhoffmanrels(data, limit = 10)} & Print all requested Hoffman polynomial relations together with the MZV dictionary. & \code{printhoffmanrels(data,0)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{11. Search (deprecated/needs re-writing/slow)}}\\[2pt]
+\code{mzvrelations(pts, deg = 1, prec = 100, extra = 60, height = 10^6)} & Search numerically among homogeneous products of a supplied fixed-weight MZV list. & \code{mzvrelations([[2,3],[3,2],[5]],1,100)} \\
+\addlinespace[2pt]
+\code{mzvnlin(k, a = 2, b = 3, prec = 100, extra = 60, height = 10^6)} & Search for quadratic candidates among the weight-k words over a and b. & \code{mzvnlin(5,2,3,100)} \\
+\addlinespace[2pt]
+\code{liftrelation(c, reps, n)} & Lift a relation on the distinct monomial images back to the chosen representative homogeneous monomials of total degree deg in the full ordered monomial basis. & \code{liftrelation([1,-1]~,[1,3],4)} \\
+\addlinespace[2pt]
+\code{mzvrels(k, deg, prec = 100, extra = 60, height = 10^6)} & Search numerically for relations among the distinct formal monomial images, then lift the surviving coefficient vectors back to representatives in the full ordered homogeneous monomial basis of total degree deg. The exact formal kernel is kept separate. & \code{mzvrels(14,2,100)} \\
+\addlinespace[2pt]
+\code{qrelations(k, prec = 100, extra = 60, height = 10^6)} & Search numerically for linear relations among all admissible weight-k MZVs. & \code{qrelations(5,100)} \\
+\addlinespace[2pt]
+\code{showrel(k, prec = 100, extra = 60, height = 10^6)} & Return a labelled fixed-weight numerical relation report. & \code{showrel(5,100)} \\
+\addlinespace[2pt]
+\code{dimZk(k, prec = 100, extra = 60, height = 10^6)} & Return the numerical estimate size-rank obtained from qrelations together with the full search report. The notebook explicitly does not treat this as a certified dimension or bound. & \code{dimZk(5,100)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{12. Display and optional export}}\\[2pt]
+\code{formatrelation(c, labels)} & Format an integer coefficient vector against a supplied list of term labels. & \code{formatrelation([1,-1]~,["A","B"])} \\
+\addlinespace[2pt]
+\code{formatmzvrel(c, pts)} & Format a linear relation using the original mzv[index] notation. & \code{formatmzvrel([1,-1]~,[[2,3],[3,2]])} \\
+\addlinespace[2pt]
+\code{relationpolys(data)} & Return the candidate polynomials in the report's symbolic coordinate variables. & \code{relationpolys(mzvrels(14,2,100))} \\
+\addlinespace[2pt]
+\code{printmzvrel(data, limit = 10)} & Print explicitly labelled numerical candidates and their search precision. & \code{printmzvrel(showrel(5,100),5)} \\
+\addlinespace[2pt]
+\code{exportmzvrelations(data, filename)} & Append candidate equations with their status and numerical search settings. & \code{exportmzvrelations(data,"rels.txt")} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{14. Consistency checks}}\\[2pt]
+\code{checkequal(actual, expected, label)} & Abort if two exact test values differ; otherwise return 1. It is the basic assertion helper used by selftest and numericaltest. & \code{checkequal(2+2,4,"arithmetic")} \\
+\addlinespace[2pt]
+\code{selftest()} & Run exact internal consistency checks for the combinatorics, formal kernel, stuffle ordering, Hoffman ordering, normalization, and rewriting code. & \code{selftest()} \\
+\addlinespace[2pt]
+\code{numericaltest()} & Run numerical consistency checks, including higher-precision rejection of a false candidate, a known relation, stuffle evaluation, Hoffman verification, and preservation of global precision. & \code{numericaltest()} \\
+\addlinespace[2pt]
+\bottomrule
+\end{longtable}
+\endgroup
+
+\section{SageMath command reference}
+The following table lists every user-defined function in notebook order. Examples are short usage patterns; some assume objects created by an immediately preceding step in the standard workflow.
+
+\begingroup\scriptsize\sloppy
+\setlength\LTpre{0pt}\setlength\LTpost{0pt}
+\begin{longtable}{@{}L{0.245\textwidth}L{0.440\textwidth}L{0.245\textwidth}@{}}
+\toprule
+Command & Purpose & Example \\
+\midrule
+\endfirsthead
+\toprule
+Command & Purpose & Example \\
+\midrule
+\endhead
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{2. Reproduce the GP coordinate ordering}}\\[2pt]
+\code{perms(x,y,a=2,b=3)} & Return the GP-ordered words with x copies of a and y copies of b. & \code{perms(2,1)} \\
+\addlinespace[2pt]
+\code{parts(k,a=2,b=3)} & Return all GP-ordered words of total weight k over a and b. & \code{parts(14)} \\
+\addlinespace[2pt]
+\code{islyndon(w)} & Test strict minimality among nontrivial cyclic rotations. & \code{islyndon([2,3])} \\
+\addlinespace[2pt]
+\code{lyndonwords(k)} & Return strict weight-k Lyndon words in the same order as GP. & \code{lyndonwords(12)} \\
+\addlinespace[2pt]
+\code{weightwalk(weights,pos,remaining)} & Reproduce the GP exponent recursion for weighted degree. & \code{weightwalk([2,3,5],0,10)} \\
+\addlinespace[2pt]
+\code{weightpartition(weights,exps)} & Return the sorted factor-weight partition of one exponent vector. & \code{weightpartition([2,3,5],[1,1,1])} \\
+\addlinespace[2pt]
+\code{lyndondata(k)} & Reproduce the GP fixed-weight coordinate model and its ordering. & \code{data=lyndondata(14)} \\
+\addlinespace[2pt]
+\code{xfactors(k,i)} & Return the GP-convention MZV factors defining the 1-based coordinate Xi. & \code{xfactors(14,20)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{3. GP/Sage convention and the ordered Hoffman family}}\\[2pt]
+\code{tosage(w)} & Convert one GP-convention MZV word to Sage's opposite composition convention. & \code{tosage([2,3])} \\
+\addlinespace[2pt]
+\code{hoffmanwords(k)} & Return the GP-ordered weight-k Hoffman words over 2 and 3. & \code{hoffmanwords(14)} \\
+\addlinespace[2pt]
+\code{hoffmanelements(k)} & Return the ordered GP Hoffman family as exact Sage motivic elements. & \code{hoffmanelements(14)} \\
+\addlinespace[2pt]
+\code{printhoffman(k)} & Print the Hoffman variables with their GP-convention single-MZV meanings. & \code{printhoffman(14)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{4. Exact fixed-weight change-of-basis matrices}}\\[2pt]
+\code{clearcaches()} & Clear cached phi images and exact conversion matrices. & \code{clearcaches()} \\
+\addlinespace[2pt]
+\code{wordphi(w)} & Return and cache the exact phi image of one GP-convention MZV word. & \code{wordphi([2,3])} \\
+\addlinespace[2pt]
+\code{ftovector(z)} & Convert a homogeneous element of Sage's auxiliary F-algebra to its exact rational coordinate vector via homogeneous\_to\_vector(). & \code{ftovector(wordphi([2,3]))} \\
+\addlinespace[2pt]
+\code{wordphivector(w)} & Return and cache the fixed rational phi vector of one GP-convention MZV word. & \code{wordphivector([2,3])} \\
+\addlinespace[2pt]
+\code{basisphimatrix(words)} & Return the matrix whose columns are the phi vectors of the supplied words. & \code{basisphimatrix(words)} \\
+\addlinespace[2pt]
+\code{hoffphimatrix(k)} & Return and cache the matrix whose columns are the ordered Hoffman phi vectors. & \code{hoffphimatrix(14)} \\
+\addlinespace[2pt]
+\code{xphivectors(k)} & Build and cache every Xi phi vector directly by multiplication in the F algebra. & \code{xphivectors(14)} \\
+\addlinespace[2pt]
+\code{checkbasiswords(k,words)} & Check that all supplied words are convergent GP-convention MZVs of weight k. & \code{checkbasiswords(14,hoffmanwords(14))} \\
+\addlinespace[2pt]
+\code{basismatrix(k,words)} & Compute the exact rational matrix A\_B such that X=A\_B B for the supplied ordered single-MZV basis. The routine verifies that the phi-coordinate matrix is square and nonsingular. & \code{basismatrix(14,hoffmanwords(14))} \\
+\addlinespace[2pt]
+\code{basischange(k,source,target)} & Compute the exact rational matrix C such that source=C target for two ordered admissible bases of the same weight, and verify the matrix equation exactly. & \code{basischange(5,hoffmanwords(5),lowbasis(5,2)['words'])} \\
+\addlinespace[2pt]
+\code{hoffmanmatrix(k)} & Compute all Xi coordinates in the ordered Hoffman basis. & \code{amat=hoffmanmatrix(14)} \\
+\addlinespace[2pt]
+\code{checkbasisrow(k,i,words,amat)} & Verify one matrix row as an exact equality in the motivic MZV algebra. & \code{checkbasisrow(5,2,hoffmanwords(5),hoffmanmatrix(5))} \\
+\addlinespace[2pt]
+\code{checkrow(k,i,amat=None)} & Verify one Hoffman-matrix row exactly. & \code{checkrow(5,2)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{5. Convert the Hoffman basis to an admissible target basis}}\\[2pt]
+\code{positivewords(total,length)} & Return positive compositions in decreasing lexicographic order. & \code{positivewords(7,3)} \\
+\addlinespace[2pt]
+\code{admissibledepth(k,depth)} & Return admissible GP-convention words of weight k and exact depth. & \code{admissibledepth(14,2)} \\
+\addlinespace[2pt]
+\code{admissibleupto(k,maxdepth)} & Return all admissible weight-k words of depth at most maxdepth. & \code{admissibleupto(14,3)} \\
+\addlinespace[2pt]
+\code{lowrank(k,maxdepth)} & Return the exact rank of admissible weight-k MZVs up to the chosen depth. & \code{lowrank(14,3)} \\
+\addlinespace[2pt]
+\code{printlowranks(k,maxdepth=4)} & Print cumulative admissible ranks by depth and the full Hoffman dimension. & \code{printlowranks(14,3)} \\
+\addlinespace[2pt]
+\code{lowbasis(k,maxdepth=None)} & Select one deterministic basis from the admissible candidate words up to the requested depth by successive exact rank increases. This is a convenience selection rule, not a canonicality claim. & \code{lowbasis(5,2)} \\
+\addlinespace[2pt]
+\code{printlowbasis(k,maxdepth=None)} & Print the selected admissible basis and cumulative rank profile. & \code{printlowbasis(5,2)} \\
+\addlinespace[2pt]
+\code{linearmzvtext(row,words)} & Format one exact linear combination directly in mzv notation. & \code{linearmzvtext([1,-2],[(2,3),(3,2)])} \\
+\addlinespace[2pt]
+\code{hoffmantolow(k,maxdepth=None)} & For the admissible basis selected by lowbasis, compute the exact matrix C with H=C B. & \code{hoffmantolow(5,2)} \\
+\addlinespace[2pt]
+\code{printhoffmantolow(k,maxdepth=None,limit=0)} & Print each Hoffman basis element in the selected admissible basis. & \code{printhoffmantolow(5,2)} \\
+\addlinespace[2pt]
+\code{lowmatrix(k,maxdepth=None)} & Compute A\_H C for the selected admissible target and verify that it equals a direct basismatrix computation for the same target basis. & \code{lowmatrix(5,2)} \\
+\addlinespace[2pt]
+\code{checklowrow(k,i,maxdepth=None,amat=None)} & Verify one row of the Xi-to-target matrix exactly. & \code{checklowrow(5,1,2)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{7. Generate the exact formal relations}}\\[2pt]
+\code{getexponents(n,d)} & Return weak compositions of d into n parts in the same order as GP. & \code{getexponents(3,2)} \\
+\addlinespace[2pt]
+\code{exponentimage(exps,powers)} & Add coordinate exponent vectors with the multiplicities in powers. & \code{exponentimage([[1,0],[0,1]],[2,1])} \\
+\addlinespace[2pt]
+\code{formalrels(k,d)} & Reproduce the sparse binomial basis of the degree-d kernel in exactly the same degree-d monomial ordering as the GP notebook. & \code{formalrels(14,2)} \\
+\addlinespace[2pt]
+\code{xmonomial(powers)} & Format one degree-d monomial in X1,...,XN from its exponent vector. & \code{xmonomial([0,2,1])} \\
+\addlinespace[2pt]
+\code{printformal(k,d,limit=0)} & Print the sparse formal relation basis in Xi notation. & \code{printformal(14,2,5)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{8. Rewrite all relations in Hoffman or another admissible basis}}\\[2pt]
+\code{primitivepoly(poly)} & Clear all rational denominators, divide by the gcd of the resulting integer coefficients, and choose the sign so that Sage's leading coefficient is positive. & \code{primitivepoly(QQ(2)/3*t^2-QQ(4)/9*t)} \\
+\addlinespace[2pt]
+\code{normalizationdata(poly)} & Return the least common denominator used to clear coefficients and the gcd subsequently removed. It reports the scale before the final sign convention. & \code{normalizationdata(poly)} \\
+\addlinespace[2pt]
+\code{basisring(n,prefix='B')} & Return a polynomial ring with one variable for each basis element. & \code{R=basisring(3,"H")} \\
+\addlinespace[2pt]
+\code{basisforms(amat,ring=None,prefix='B')} & Return the linear basis forms representing X1 through XN. & \code{basisforms(A,prefix="H")} \\
+\addlinespace[2pt]
+\code{slotbasis(forms,powers)} & Evaluate one degree-d monomial in the Xi after replacing each Xi by its linear form in the target basis. & \code{slotbasis(forms,powers)} \\
+\addlinespace[2pt]
+\code{relationbasis(c,k,d,words,amat=None,prefix='B')} & Rewrite one coefficient vector relative to the ordered degree-d monomial basis in a supplied exact target basis and normalize the result. & \code{relationbasis(c,k,d,words,amat)} \\
+\addlinespace[2pt]
+\code{allbasis(k,d,words,amat=None,prefix='B',name='basis')} & Rewrite all sparse formal relations in a supplied exact basis. It expands only degree-d monomials that actually occur in the stored relation pairs and caches those expansions. & \code{allbasis(k,d,words,amat)} \\
+\addlinespace[2pt]
+\code{allhoffman(k,d,amat=None)} & Rewrite all formal relations in the ordered Hoffman basis. & \code{allhoffman(14,2,hoffmanmatrix(14))} \\
+\addlinespace[2pt]
+\code{alllow(k,d,maxdepth=None,amat=None)} & Rewrite all formal relations in the selected admissible basis. & \code{alllow(5,2,2,lowmatrix(5,2))} \\
+\addlinespace[2pt]
+\code{convertpoly(poly,forms)} & Substitute linear target-basis forms into one source-basis polynomial. & \code{convertpoly(poly,forms)} \\
+\addlinespace[2pt]
+\code{converthoffmanrels(data,maxdepth=None)} & Convert a previously computed Hoffman relation set by the explicit H=C B substitution. When available, it starts from the unnormalized rational Hoffman polynomials before applying the final normalization. & \code{converthoffmanrels(data,2)} \\
+\addlinespace[2pt]
+\code{polytext(poly,words)} & Format one basis polynomial directly with GP-convention mzv labels. & \code{polytext(poly,words)} \\
+\addlinespace[2pt]
+\code{printbasisrels(data,limit=0,direct=True)} & Print relations in formal basis variables or directly in mzv notation. & \code{printbasisrels(data,5,True)} \\
+\addlinespace[2pt]
+\code{printhoffmanrels(data,limit=0,direct=True)} & Print relations in the Hoffman basis. & \code{printhoffmanrels(data,5,True)} \\
+\addlinespace[2pt]
+\code{printlowrels(data,limit=0,direct=True)} & Print relations in the selected admissible basis. & \code{printlowrels(data,5,True)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{9. Export exact basis matrices to PARI/GP}}\\[2pt]
+\code{gpword(w)} & Format one integer word as a GP vector literal. & \code{gpword((2,3))} \\
+\addlinespace[2pt]
+\code{gpwords(words)} & Format a list of words as a GP vector-of-vectors literal. & \code{gpwords(hoffmanwords(5))} \\
+\addlinespace[2pt]
+\code{gpmatrix(amat)} & Format an exact rational Sage matrix as a GP matrix literal. & \code{gpmatrix(hoffmanmatrix(5))} \\
+\addlinespace[2pt]
+\code{exportgp(k,filename=None,amat=None)} & Serialize the Hoffman word list and Xi-to-Hoffman matrix as [weight,words,matrix]. This is the export directly accepted by the current GP loadhoffman routine. & \code{exportgp(14)} \\
+\addlinespace[2pt]
+\code{exportbasisgp(k,words,filename,amat=None)} & Serialize an arbitrary ordered basis and its Xi-coordinate matrix as [weight,words,matrix]. The current GP loader is Hoffman-specific, so this generic record is not directly accepted by loadhoffman. & \code{exportbasisgp(5,lowbasis(5,2)['words'],'basis5.gp')} \\
+\addlinespace[2pt]
+\code{exportlowgp(k,maxdepth=None,filename=None,amat=None)} & Serialize the selected admissible target basis and the composite Xi-to-target matrix. The current GP loader is Hoffman-specific, so this file needs a generic loader or separate handling on the GP side. & \code{exportlowgp(5,2)} \\
+\addlinespace[2pt]
+\addlinespace[3pt]\multicolumn{3}{@{}l}{\textbf{10. Consistency checks}}\\[2pt]
+\code{selftest()} & Run exact internal consistency checks for ordering conventions, the weight-five matrices, target-basis conversion, formal relation counts, and optional cached weight-fourteen data. & \code{selftest()} \\
+\addlinespace[2pt]
+\bottomrule
+\end{longtable}
+\endgroup
+
+
+\begin{thebibliography}{99}
+
+\bibitem{SageMZV}
+SageMath developers,
+\emph{Algebra of motivic multiple zeta values},
+SageMath Reference Manual, release 10.8,
+\url{https://doc.sagemath.org/html/en/reference/modfrm/sage/modular/multiple_zeta.html}.
+
+\bibitem{PARI}
+The PARI Group,
+\emph{PARI/GP User's Guide and Online Function Reference},
+\url{https://pari.math.u-bordeaux.fr/doc.html}.
+\end{thebibliography}
+
+\end{document}

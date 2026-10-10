@@ -1,0 +1,26 @@
+zetaM = (inds, M, ord, precDec) -> (
+  prec = ceiling(log(2,10)*precDec);
+  asym = new MutableList from (for i from 0 to ord list 0);
+  for i from 0 to ord do asym#i = new MutableList from (
+  	for i from 0 to #inds list toRR(prec, 0)
+  );
+
+  asym#0#(#inds) = toRR(prec, 1);
+  
+  for d from 1 to #inds do (
+    for i from 1 to ord do (
+      asym#(i)#(#inds-d) =  1/i * (if i+1-inds#(#inds-d) < 0 then 0 else asym#(i+1 - inds#(#inds-d))#(#inds+1-d) - sum(0..(i-1), k -> (asym#(k)#(#inds - d) * binomial(i, i+1-k) ))); 
+     );
+   );
+   
+  vec = new MutableList from (for d from 0 to #inds list sum(0..ord, i -> asym#(i)#d / M^i));
+
+  for i from 0 to M-1 do (
+  	for d from 0 to #inds-1 do (
+  	  vec#(d) = vec#(d) + vec#(d+1) * 1/(M-i)^(inds#(d));
+  );
+  );
+
+  return vec#0;
+  		
+);

@@ -1,0 +1,11 @@
+Reg-shuffle ideal:
+
+ideal(2*v_[2, 1]+v_[1, 2],3*v_[1, 1, 1]-v_[3])
+
+Reg-stuffle ideal:
+
+ideal(v_[3]+v_[2, 1]+v_[1, 2],3*v_[1, 1, 1]+v_[2, 1]+v_[1, 2])
+
+Univ-Zeta ideal (only admissible words):
+
+ideal(v_[3]-v_[2, 1])

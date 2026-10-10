@@ -1,0 +1,3 @@
+\contentsline {section}{\tocsection {}{1}{PARI/GP command reference}}{1}{section.1}%
+\contentsline {section}{\tocsection {}{2}{SageMath command reference}}{6}{section.2}%
+\contentsline {section}{\tocsection {}{}{References}}{9}{section*.2}%
