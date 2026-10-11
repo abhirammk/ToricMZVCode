@@ -36,7 +36,8 @@ memory; PARI's stack is allowed to grow to 8 GiB.
 
 The source monomials are products of the MZVs indexed by Lyndon words on
 2 and 3. Macaulay2 first treats the Lyndon generators as formal independent
-variables and computes binomial generators of the monomial toric ideal.
+variables and computes a minimal binomial generating set of the monomial
+toric ideal using [FourTiTwo's `toricMarkov`](https://macaulay2.com/doc/Macaulay2/share/doc/Macaulay2/FourTiTwo/html/_toric__Markov.html).
 The change-of-basis matrix expresses each weight-w source monomial as a
 linear combination of the chosen weight-w MZVs. Substituting these linear
 forms into the binomials gives the relations in the new basis. A polynomial
@@ -54,8 +55,10 @@ by its integer coefficient gcd. LLL is applied separately in each polynomial
 degree, with `delta=0.99`. The nonzero output rows form an integer lattice
 basis of these primitive input relations. No saturation or further gcd
 division is performed. The output generates the same ideal over the rationals
-and is linearly independent degree by degree. It need not be a minimal set
-of ideal generators. Different runs of LLL can give different reduced bases.
+and remains a minimal homogeneous generating set: the invertible basis
+change, nonzero rational rescalings and invertible LLL combinations within
+each degree preserve minimality. Different runs of LLL can give different
+reduced generating sets.
 
 Basis conversion uses Sage's map to the auxiliary F-algebra, including
 numerical rational reconstruction of some coefficients. The subsequent
