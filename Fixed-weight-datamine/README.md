@@ -1,278 +1,101 @@
 # Toric relations in fixed-weight MZV bases
 
-## AI Usage
+This code computes generators of the toric ideal associated with the Lyndon
+monomial basis in a fixed weight, and expresses them in the Hoffmann or a
+depth-minimal MZV basis. The resulting polynomial relations are reduced by
+LLL and written to text and JSON files.
 
-Except for the Macaulay2 (M2) file, all the code in this folder was generated using GPT-6.1-Sol via Codex.
+## Usage
 
-## Mathematical objective
-
-For a chosen weight $w$, the code computes generating polynomial relations
-among the weight-$w$ monomials in the chosen Lyndon generators, rewrites these
-relations in a basis of individual weight-$w$ MZVs, and exports an integer
-LLL-reduced linear basis of the resulting relations.
-
-More precisely, let $x_1,\ldots,x_r$ be formal variables indexed by the Lyndon
-words on the alphabet $\{2,3\}$ of weight at most $w$. Give $x_k$ the weight
-of its index word. Let $m_0(x),\ldots,m_{n-1}(x)$ be all monomials of weighted
-degree $w$. The Macaulay2 calculation computes generators of the toric ideal
-
-$$
-I_w=\ker\bigl(\mathbb Q[X_0,\ldots,X_{n-1}]
-       \longrightarrow\mathbb Q[x_1,\ldots,x_r],\quad X_i\longmapsto m_i(x)\bigr).
-$$
-
-For the basis change, interpret each $x_k$ as the MZV indexed by its Lyndon
-word. Choose a target basis $b_0,\ldots,b_{n-1}$ of the weight-$w$ component
-represented by Sage's MZV coordinate model, and compute the rational matrix
-$C$ satisfying
-
-$$
-m_i=\sum_{j=0}^{n-1}C_{ij}b_j.
-$$
-
-The corresponding substitution of formal polynomial variables is
-$X_i\mapsto\sum_j C_{ij}B_j$. Since $C$ is invertible, this substitution is an
-isomorphism of polynomial rings. It carries the supplied generators of $I_w$
-to generators of the transported ideal in $\mathbb Q[B_0,\ldots,B_{n-1}]$.
-The exported polynomials are equations in these formal variables, whose
-interpretation is $B_j=b_j$.
-
-The weight $w$ labels the basis elements, not the total weight of every
-exported polynomial. A polynomial of ordinary degree $d$ in the $B_j$ has
-MZV weight $dw$. The calculation starts from the formal monomial toric ideal;
-it does not search for all possible polynomial relations among numerical MZV
-values, or evaluate the input equations as MZV values before transforming them.
-
-## Target bases and coordinates
-
-**Hoffmann (Hoffman–Brown) basis.** The code uses Sage's `Multizetas(QQ).basis_brown(w)`:
-individual MZVs whose index words contain only 2 and 3 and have weight $w$,
-in the order returned by Sage.
-
-**Depth-minimal basis.** Depth means the number of indices of an individual
-MZV. The code enumerates convergent index words of weight $w$ in increasing
-depth and retains a word whenever its coordinate vector increases the rank.
-It exhausts each depth before proceeding, and stops at full rank. Consequently,
-for each depth bound $d$, the selected elements of depth at most $d$ span all
-weight-$w$ MZVs of depth at most $d$ in the coordinate model. This maximizes
-the number of low-depth basis elements. The basis is not unique; ties follow
-the implemented composition enumeration.
-
-All index lists use Sage's increasing summation convention:
-
-$$
-\zeta(s_1,\ldots,s_k)=
-\sum_{0<n_1<\cdots<n_k}\frac{1}{n_1^{s_1}\cdots n_k^{s_k}},\qquad s_k\geq2.
-$$
-
-Here a **coordinate vector** means the coefficient vector of the homogeneous
-image under Sage's map $\phi$ into its auxiliary F-algebra. It is not a
-numerical approximation to an MZV. To compute $C$, the code forms matrices
-$S$ and $P$ whose rows are respectively the coordinate vectors of the source
-products $m_i$ and the target elements $b_j$. It then computes
-$C=SP^{-1}$. Source products are evaluated multiplicatively in the F-algebra,
-without first expanding them into sums of MZVs.
-
-These calculations produce exact rational matrices, but some coefficients of
-Sage's map, and of the high-weight implementation below, are obtained by
-numerical rational reconstruction. The polynomial and lattice computations
-are exact relative to those matrices. They are not independent proofs of
-the reconstructed MZV identities or numerical algebraic independence.
-
-## Integer reduction and the meaning of the exported generators
-
-For each transformed polynomial $q_i$, the code clears all coefficient
-denominators and divides the resulting integer coefficient gcd. Denote the
-resulting primitive integer polynomial by $\widetilde q_i$. This rational
-rescaling preserves the generated ideal over $\mathbb Q$.
-
-For each ordinary polynomial degree $d$ separately, write the coefficient
-vectors of the $\widetilde q_i$ in a common monomial order as the rows of an
-integer matrix $A_d$. The code calls Sage's LLL routine with `delta=0.99`
-and requests its transformation matrix $T$. It checks
-$TA_d=R$ and $\det(T)=\pm1$, removes zero rows, checks that the number of
-remaining rows equals $\operatorname{rank}(A_d)$, and fixes row signs.
-
-Thus the output rows form a $\mathbb Z$-basis of
-
-$$
-L_d=\sum_{\deg(q_i)=d}\mathbb Z\,
-       \operatorname{coeff}(\widetilde q_i).
-$$
-
-This is the lattice generated by the primitive transformed input polynomials.
-It is not replaced by its saturation. Output rows are not divided by their
-gcd after LLL, since that could enlarge $L_d$.
-
-The exported equations are linearly independent and span the same rational
-relation space as the transformed input generators, degree by degree. They
-therefore still generate the transported ideal over $\mathbb Q$. Their
-number is minimal as a **linear basis of those relation spaces**; the code
-does not minimize the number of ideal generators by eliminating polynomial
-multiples. LLL is not canonical and does not guarantee globally shortest
-vectors. Regeneration may give a different reduced basis of the same lattice.
-
-## What each code file does
-
-### `toric-source/compute_toric_relations.m2`
-
-Enumerates the Lyndon words on $\{2,3\}$ using Duval's algorithm, constructs
-the weighted polynomial ring in the corresponding formal variables, and
-lists its weight-$w$ monomials. Their exponent vectors form the columns of
-an integer matrix $A$. FourTiTwo's `toricMarkov(A)` computes a Markov basis:
-binomials $X^{u_+}-X^{u_-}$ generating $I_w$.
-
-The script writes the Lyndon index words, source monomial exponent vectors,
-and both exponent vectors of every binomial to
-`toric-relations-weight-<w>.json`. The Python driver sets the requested value
-of `j` in a temporary copy and runs it inside `toric-source/`.
-
-### `basis_coordinates.py`
-
-Validates the source exponent data and toric binomial identities, selects the
-Hoffmann, depth-minimal or user-provided target basis, and obtains its
-change-of-basis matrix $C$. Computed target coordinate matrices must have
-full rank. A supplied matrix is checked for dimensions, exact rational entry
-format, and invertibility; the correctness of its claimed MZV identities is
-trusted rather than independently recomputed.
-
-For weights below 16, it uses Sage's existing $\phi$ implementation. When
-coordinates must be computed at weights 16–18, it invokes
-`high_weight_coordinates.py`. If a complete saved matrix is supplied, that
-high-weight calculation is bypassed. `compute_coordinates` returns the
-basis index lists together with the rational entries of $C$.
-
-### `high_weight_coordinates.py`
-
-Computes the F-algebra image $\phi(\zeta(s_1,\ldots,s_k))$ needed to form the
-source and target coordinate matrices at weights 16–18. It does not return
-the final change-of-basis matrix by itself.
-
-For an index word $s$ of weight $w$, Sage's `compute_u_on_compo(s)` gives the
-coaction-derived part $u(s)$. The remaining direction is represented by
-$f_w=\texttt{F.gen(w)}$: an odd shuffle generator when $w$ is odd, and a
-specified rational multiple of a power of $f_2$ when $w$ is even. For words
-not handled directly by Sage's multiplicative-basis routine, the code forms
-
-$$
-\phi(\zeta(s))=u(s)+a(s)f_w.
-$$
-
-It reconstructs $a(s)$ by comparing the numerical MZV period with a lift of
-$u(s)$ through the multiplicative basis, dividing the remaining period by
-$\zeta(w)$. Products in this lift are evaluated factor by factor with PARI,
-avoiding expansion into a large sum of MZVs. Rational reconstructions at
-1024 and 1536 bits must agree. Agreement is a consistency check, not a
-proof of the reconstruction. Lower-weight calls use Sage's existing map.
-
-The class also extends Sage's multiplicative-generator data to weight 18
-using the eight generators in [Blümlein, Broadhurst and Vermaseren,
-Appendix B, equation (B.15)](https://arxiv.org/pdf/0907.2557), with index lists
-reversed to Sage's convention. Products of these and the lower-weight
-generators give a 65-dimensional coordinate matrix, whose rank is checked.
-This multiplicative basis is an intermediate coordinate system; it is not
-the exported Hoffmann or depth-minimal basis.
-
-For high-weight depth-minimal selection, it uses the coaction-derived
-vectors after first selecting $\zeta(w)$. This first element supplies the
-$f_w$ direction, so replacing subsequent $\phi$ images by $u$ images does
-not change the independence decisions.
-
-### `transform_relations.py`
-
-Forms the linear substitutions $X_i=\sum_jC_{ij}B_j$, applies them to the
-source binomials in a polynomial ring over $\mathbb Q$, and passes the
-resulting polynomials to the integer reduction routine.
-
-It then verifies equality of rational relation spans and that the number
-of output polynomials is the input rank, separately for each polynomial
-degree. For quadratics it transforms symmetric coefficient matrices back
-by $D^{\mathsf T}QD$, where $D=C^{-1}$. For other degrees it compares the
-output coefficient row space with the directly substituted input row space.
-These checks verify the polynomial transformation, not the numerical
-reconstruction used to obtain $C$.
-
-### `reduce_and_export_relations.py`
-
-Performs the primitive integer normalization and degree-wise LLL reduction
-described above, including exact checks on the integer transformation.
-It also renders the basis definitions and polynomial equations as text,
-and writes their sparse coefficient/exponent representation as JSON.
-
-### `product_basis_cache.py`
-
-Temporarily caches the product-basis expansions returned by Sage's
-`Multizetas.basis_data`. Sage's inverse-map calculations repeatedly expand
-products of multiplicative MZV basis elements; caching avoids repeating
-these expansions. Calls for the same parent, coefficient ring and weight
-reuse the expansions through fresh iterators. It changes neither the basis order nor
-the arithmetic or precision, restores the original Sage method on exit,
-and creates no files on disk.
-
-### `generate_relation_files.py`
-
-Coordinates the calculation for each requested weight and target basis.
-It loads the toric generators or invokes Macaulay2 if their source file is
-missing; loads or computes $C$; saves the basis and matrix; transforms,
-reduces and verifies the polynomial generators; and writes the relation files.
-
-By default, an existing text/JSON pair with a saved matrix is kept without
-rerunning the calculation or its checks. Saved matrices in the selected
-output directory are preferred, with the project directory as a fallback.
-If only the coordinate file needs restoring, the driver checks the existing
-basis definitions and relation span before retaining the existing equations.
-
-## Commands
+Run with SageMath (tested with 10.9):
 
 ```sh
 sage -python generate_relation_files.py
 ```
 
-For each $w=10,\ldots,18$, this computes or reuses the generating relations
-of the transported toric ideal for both target bases and writes the files
-below.
+The default is weights 10–18, in both bases. Existing output files and
+change-of-basis matrices are reused. To select a weight, basis or range:
 
 ```sh
 sage -python generate_relation_files.py --weight 12
 sage -python generate_relation_files.py --weight 16 --basis depth-minimal
-sage -python generate_relation_files.py --min-weight 15 --max-weight 18 --force
+sage -python generate_relation_files.py --min-weight 15 --max-weight 18
 ```
 
-`--force` recomputes the relation files using the available saved matrices;
-it does not force a new MZV coordinate calculation. `--output-dir path`
-changes the destination of the coordinate and relation files, while toric
-source files remain in the project's `toric-source/`. To recompute a saved
-matrix, remove its matching coordinate files from the lookup locations and
-rerun.
+Add `--force` to recompute the relations using the saved matrices, or
+`--output-dir path` to write the results elsewhere. To recompute a matrix,
+remove its saved file; if using another output directory, also remove the
+corresponding project copy, which is used as a fallback.
 
-A custom basis requires a single weight:
+Macaulay2 with FourTiTwo/4ti2 is needed only when the toric source file is
+missing. Set `M2_EXECUTABLE` if Macaulay2 is not on PATH. The driver accepts
+weights 2–18. High-weight calculations can require substantial time and
+memory; PARI's stack is allowed to grow to 8 GiB.
+
+## Calculation
+
+The source monomials are products of the MZVs indexed by Lyndon words on
+2 and 3. Macaulay2 first treats the Lyndon generators as formal independent
+variables and computes binomial generators of the monomial toric ideal.
+The change-of-basis matrix expresses each weight-w source monomial as a
+linear combination of the chosen weight-w MZVs. Substituting these linear
+forms into the binomials gives the relations in the new basis. A polynomial
+of degree d in the basis variables has MZV weight d times w.
+
+The Hoffmann basis is Sage's `basis_brown`, with index words in 2 and 3.
+For the depth-minimal basis, independent MZVs are selected in increasing
+depth, exhausting each depth before proceeding. This gives as many
+low-depth elements as possible; choices within a depth depend on the
+enumeration order. Indices use Sage's increasing summation convention:
+the last index is at least 2. Depth is the number of indices.
+
+After substitution, denominators are cleared and each polynomial is divided
+by its integer coefficient gcd. LLL is applied separately in each polynomial
+degree, with `delta=0.99`. The nonzero output rows form an integer lattice
+basis of these primitive input relations. No saturation or further gcd
+division is performed. The output generates the same ideal over the rationals
+and is linearly independent degree by degree. It need not be a minimal set
+of ideal generators. Different runs of LLL can give different reduced bases.
+
+Basis conversion uses Sage's map to the auxiliary F-algebra, including
+numerical rational reconstruction of some coefficients. The subsequent
+matrix and polynomial calculations are exact over the rationals. The code
+checks invertibility, the unimodular LLL transformation and preservation
+of the relation spans.
+
+## Code
+
+- `generate_relation_files.py`: the command-line driver; obtains the source relations and matrices, then runs conversion, reduction and export.
+- `toric-source/compute_toric_relations.m2`: enumerates Lyndon words and fixed-weight monomials, and computes their toric ideal generators with FourTiTwo.
+- `basis_coordinates.py`: selects the MZV basis and computes the change-of-basis matrix from the F-algebra images of the source products and target MZVs.
+- `high_weight_coordinates.py`: computes the F-algebra images needed at weights 16–18. It uses Sage's coaction calculation and determines the remaining zeta(w) coefficient by period reconstruction, evaluating products factor by factor. Reconstructions must agree at 1024 and 1536 bits; this is a consistency check. At weight 18 it adds the multiplicative generators from [the MZV datamine paper, Appendix B, equation (B.15)](https://arxiv.org/pdf/0907.2557).
+- `transform_relations.py`: substitutes the change-of-basis matrix into the toric generators and checks the rational relation spans after reduction.
+- `reduce_and_export_relations.py`: normalizes the integer coefficients, applies LLL, checks the integer transformation, and writes the relation files.
+- `product_basis_cache.py`: keeps Sage's repeatedly used expansions of multiplicative basis products in memory during a calculation.
+
+## Files
+
+- `toric-source/toric-relations-weight-<w>.json`: Lyndon words (`vars`), source monomial exponents (`mons`), and binomial exponents (`binoms`).
+- `mzv-linear-bases/change-of-basis-weight-<w>-<basis>.json`: target MZV index lists and the rational change-of-basis matrix. These are local calculations using Sage and, at weight 18, the published datamine generators.
+- `<basis>-basis/relations-weight-<w>-<basis>.txt`: definitions of the basis variables followed by the integer polynomial equations.
+- `<basis>-basis/relations-weight-<w>-<basis>.json`: the same basis definitions and equations, encoded as `basis` and `relations`. Each relation contains `terms`, with integer strings `coefficient` and exponent vectors `exponents` in basis order.
+
+## Other bases
 
 ```sh
 sage -python generate_relation_files.py --weight 12 --basis-file my-basis.json
 ```
 
-Its JSON has `name` and `basis` (MZV index lists), with optional
-`coordinates`. Without supplied coordinates, the target basis is checked
-for independence through $\phi$, and $C$ is computed. With coordinates,
-the source `mons` order and supplied basis order must match the matrix rows
-and columns. Use integer entries or rational strings, not floating-point numbers.
+A basis file contains `name` and `basis` (a list of MZV index lists), with an
+optional `coordinates` matrix. It has the same format as the saved
+change-of-basis files. Row i of the matrix expresses source monomial i,
+in the source `mons` order, in the listed basis. Entries must be integers
+or rational strings, not floats.
 
-## Data files and output formats
+Without a matrix, the code checks independence in the F-algebra and computes
+the coordinates. A supplied matrix is checked for dimensions and
+invertibility; its MZV identities are assumed correct.
 
-- `toric-source/toric-relations-weight-<w>.json`: `vars` lists Lyndon index words; `mons` lists exponent vectors in those variables; `binoms` lists `mon1` and `mon2`, the exponent vectors in the formal $X_i$ variables defining each toric binomial.
-- `mzv-linear-bases/change-of-basis-weight-<w>-<basis>.json`: `name`, `basis` and `coordinates`, with row $i$ of `coordinates` expressing $m_i$ in the listed target basis. These are locally computed conversion files, not a copy of the MZV datamine.
-- `<basis>-basis/relations-weight-<w>-<basis>.txt`: weight and basis label, definitions $B_j=b_j$, and the integer polynomial equations.
-- `<basis>-basis/relations-weight-<w>-<basis>.json`: only `basis` and `relations`. `basis` maps variable names to the same MZV expressions as the text file. Each relation has `terms`; each term has an integer string `coefficient` and an `exponents` vector in basis order.
+## AI usage
 
-For example, in a ring with variables `B0`, `B1`, `B2`, the term encoding
-`{"coefficient":"-7","exponents":[0,2,1]}` denotes $-7B_1^2B_2$.
-This illustrates the encoding, not a claimed MZV relation. Neither source
-data nor calculation metadata is included in the relation JSON.
-
-## Requirements
-
-Use SageMath (tested with 10.9). Computing missing toric generators also
-requires Macaulay2 with FourTiTwo/4ti2; set `M2_EXECUTABLE` if necessary.
-The command-line weight range is restricted to 2–18. PARI's stack may grow
-to 8 GiB. High-weight coordinate computations, polynomial substitutions and
-LLL reductions can be expensive.
+Except for the Macaulay2 (M2) file, all the code in this folder was generated using GPT-6.1-Sol via Codex.
