@@ -1,0 +1,341 @@
+{
+  "basis": {
+    "B0": "zeta(10)",
+    "B1": "zeta(1,9)",
+    "B2": "zeta(2,8)",
+    "B3": "zeta(3,7)",
+    "B4": "zeta(1,1,8)",
+    "B5": "zeta(1,2,7)",
+    "B6": "zeta(2,1,7)"
+  },
+  "relations": [
+    {
+      "terms": [
+        {
+          "coefficient": "13081",
+          "exponents": [
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "-1778160",
+          "exponents": [
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "-1377800",
+          "exponents": [
+            1,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "-456000",
+          "exponents": [
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "-986240",
+          "exponents": [
+            1,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "-174560",
+          "exponents": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "coefficient": "-174560",
+          "exponents": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "coefficient": "18158400",
+          "exponents": [
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "10776000",
+          "exponents": [
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "2592000",
+          "exponents": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "-9484800",
+          "exponents": [
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "-1363200",
+          "exponents": [
+            0,
+            1,
+            0,
+            0,
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "coefficient": "-1363200",
+          "exponents": [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "coefficient": "850000",
+          "exponents": [
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "240000",
+          "exponents": [
+            0,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "-4768000",
+          "exponents": [
+            0,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "-688000",
+          "exponents": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "coefficient": "-688000",
+          "exponents": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "coefficient": "-1344000",
+          "exponents": [
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "-192000",
+          "exponents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "coefficient": "-192000",
+          "exponents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "coefficient": "102400",
+          "exponents": [
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0
+          ]
+        },
+        {
+          "coefficient": "51200",
+          "exponents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0
+          ]
+        },
+        {
+          "coefficient": "51200",
+          "exponents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "coefficient": "6400",
+          "exponents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0
+          ]
+        },
+        {
+          "coefficient": "12800",
+          "exponents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "coefficient": "6400",
+          "exponents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# Generated wrappers, bytecode and local filesystem clutter
+__pycache__/
+*.py[cod]
+*.sage.py
+.DS_Store
+*.tmp
+
