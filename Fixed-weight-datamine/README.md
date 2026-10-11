@@ -1,5 +1,10 @@
 # Fixed-weight MZV relations
 
+## AI Usage
+Except for the Macaulay2 (M2) code, all content in this folder was generated using GPT-6.1-Sol via Codex.
+
+## How to use
+
 ```sh
 sage -python generate_relation_files.py
 ```
