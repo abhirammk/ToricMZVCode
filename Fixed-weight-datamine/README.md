@@ -1,7 +1,7 @@
 # Fixed-weight MZV relations
 
 ## AI Usage
-Except for the Macaulay2 (M2) code, all content in this folder was generated using GPT-6.1-Sol via Codex.
+Except for the Macaulay2 (M2) file, all the code in this folder was generated using GPT-6.1-Sol via Codex.
 
 ## How to use
 
