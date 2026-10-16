@@ -1,3 +1,9 @@
+-- parameters
+-- inds: the indices of the multiple zeta value
+-- M: number of initial terms to explicitly sum
+-- ord: the order of the asymptotic tail
+-- precDec: the number of decimal digits to calculate with
+
 zetaM = (inds, M, ord, precDec) -> (
   prec = ceiling(log(2,10)*precDec);
   asym = new MutableList from (for i from 0 to ord list 0);
@@ -17,8 +23,8 @@ zetaM = (inds, M, ord, precDec) -> (
 
   for i from 0 to M-1 do (
   	for d from 0 to #inds-1 do (
-  	  vec#(d) = vec#(d) + vec#(d+1) * 1/(M-i)^(inds#(d));
-  );
+      vec#(d) = vec#(d) + vec#(d+1) * 1/(M-i)^(inds#(d));
+    );
   );
 
   return vec#0;
